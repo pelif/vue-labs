@@ -13,6 +13,14 @@
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
     crossorigin="anonymous">
 
+    <style type="text/css">
+        .logo {
+            width:30px;
+            height:30px;
+        }
+    </style>    
+
+
 </head>
 <body>
 
@@ -23,33 +31,242 @@
             </h3>
         </div>
 
-        <input 
-            type="text" 
-            class="form-control col-md-4" 
-            :value="gols" 
-            :id="gols+'id'"
-            @input="getValue()">
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-primary" @click="createNewPlay">Novo Jogo</button>
+            </div>            
+        </div>
+        
+        <div class="row">            
+        <div class="col-md-12" v-if="view!='table'">    
+        <form action="" class="form-inline">
+            
+                <input type="text" class="form-control col-md-1" v-model="newPlay.byHouse.goals">
+                {{ newPlay.byHouse.team ? newPlay.byHouse.team.name : '' }}
+                <img class="logo" :src="newPlay.byHouse.team ? newPlay.byHouse.team.logo : ''" alt="">
 
-        <button 
-        class="btn btn-primary" 
-        @click="showAlert">Fim de Jogo</button>
+                <span><h2>X</h2></span>
 
+                <img class="logo" :src="newPlay.outHouse.team ? newPlay.outHouse.team.logo : ''" alt="">
+                {{ newPlay.outHouse.team ? newPlay.outHouse.team.name : '' }}
+                <input type="text" class="form-control col-md-1" v-model="newPlay.outHouse.goals">
+
+                <button type="button" class="btn btn-primary" @click="endingPlay">Fim de Jogo</button>            
+        </form>
+    </div>    
+        
+        <div class="col-md-12" v-if="view =='table'">
+        <input type="text" name="" v-model="search" class="form-control">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th v-for="(field, index) in order.fields">
+                        <a href="#" @click.prevent="ordering(index)">{{ field | ucwords }}</a>
+                    </th>                                       
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="team in teamOrder">
+                    <td>
+                        <img class="logo" :src="team.logo" alt="">
+                        {{ team.name }}
+                    </td>
+                    <td>{{ team.points }}</td>
+                    <td>{{ team.gm }}</td>
+                    <td>{{ team.gs }}</td>
+                    <td>{{ team | balance }}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="row">
+        <div class="col-md-6">
+            <h3>Classificados para Libertadores</h3>
+            <ul>
+                <li v-for="team in liberatorsTeams">
+                    <img class="logo" :src="team.logo" alt="">
+                    {{ team.name }}
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-md-6">
+            <h3>Times Rebaixados</h3>
+            <ul>
+                <li v-for="team in relegated">
+                    <img class="logo" :src="team.logo" alt="">
+                    {{ team.name }}
+                </li>
+            </ul>
+        </div>
+        </div>
+
+
+        </div>
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>    
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>    
 
     <script>
+        class Team {
+            constructor(name, logo) {
+                this.name = name; 
+                this.logo = logo; 
+                this.points = 0;
+                this.gm = 0;
+                this.gs = 0;
+                this.balance = 0;
+            }
+
+            endPlay(outSideTeam, gm, gs) {
+                if(this.wasDraw(gm, gs)) {       
+                    this.draw(gm, gs);     
+                    outSideTeam.draw(gm, gs); 
+                    return;
+                }
+
+                if(this.wasVictory(gm, gs)) {
+                    this.victory(gm, gs); 
+                    outSideTeam.lost(gs, gm); 
+                } else {
+                    this.lost(gm, gs); 
+                    outSideTeam.victory(gs, gm); 
+                }
+            } 
+            
+            wasDraw(gm, gs) {
+                return gm === gs;
+            } 
+            
+            wasVictory(gm, gs) {
+                return gm > gs;
+            } 
+              
+            draw(gm, gs) {
+                this.updateInfo(1, gm, gs);
+            } 
+            
+            victory(gm, gs) {
+                this.updateInfo(3, gm, gs); 
+            }
+            
+            lost(gm, gs) {
+                this.updateInfo(0, gm, gs);
+            } 
+            
+            updateInfo(points, gm, gs) {
+                this.points += points; 
+                this.gm += gm; 
+                this.gs += gs;
+                this.balance += this.gm - this.gs;
+            }
+        }
+
         new Vue({
             el: "#app",
             data: {
-                gols: 3
+                goals: 3,
+                order: {
+                    fields: ['points', 'gm', 'gs', 'balance'],
+                    sort: ['desc', 'desc', 'desc', 'desc']
+                }, 
+                search: '',
+                teams: [
+                    new Team('América MG', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/america_mg_60x60.png?raw=true'),
+                    new Team('Atlético PR', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/atletico-pr_60x60.png?raw=true'),
+                    new Team('Atlético MG', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/atletico_mg_60x60.png?raw=true'),
+                    new Team('Bahia', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/bahia_60x60.png?raw=true'),
+                    new Team('Botafogo', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/botafogo_60x60.png?raw=true'),
+                    new Team('Ceará', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/ceara_60x60.png?raw=true'),
+                    new Team('Chapecoense', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/chapecoense_60x60.png?raw=true'),
+                    new Team('Corinthians', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/corinthians_60x60.png?raw=true'),
+                    new Team('Cruzeiro', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/cruzeiro_60x60.png?raw=true'),
+                    new Team('Flamengo', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/flamengo_60x60.png?raw=true'),
+                    new Team('Fluminense', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/fluminense_60x60.png?raw=true'),
+                    new Team('Gremio', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/gremio_60x60.png?raw=true'),
+                    new Team('Internacional', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/internacional_60x60.png?raw=true'),
+                    new Team('Palmeiras', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/palmeiras_60x60.png?raw=true'),
+                    new Team('Paraná', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/parana_60x60.png?raw=true'),
+                    new Team('Santos', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/santos_60x60.png?raw=true'),
+                    new Team('São Paulo', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/sao_paulo_60x60.png?raw=true'),
+                    new Team('Sport', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/sport_60x60.png?raw=true'),
+                    new Team('Vasco', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/vasco_60x60.png?raw=true'),
+                    new Team('Vitória', 'https://github.com/schoolofnetcom/vue2-rev3/blob/master/assets/vitoria_60x60.png?raw=true')
+                ], 
+                newPlay: {
+                    byHouse: {
+                        team: null, 
+                        goals: 0
+                    }, 
+                    outHouse: {
+                        team: null, 
+                        goals: 0         
+                    }
+                }, 
+                view: 'table' 
+            },
+            computed: {
+                liberatorsTeams() {
+                    return this.teams.slice(0,6)
+                },
+                relegated() {
+                    return this.teams.slice(16,20)
+                },
+                teamOrder() {
+                    let teams = _.orderBy(this.teams, this.order.fields, this.order.sort)
+                    let self = this;
+                    return _.filter(teams, function(team) {
+                        let search = self.search.toLowerCase();
+                        return team.name.toLowerCase().indexOf(search) >= 0;
+                    })
+                }
             },
             methods: {
-                showAlert() {
+                showAlert() {                    
                     alert('Fim de Jogo')
                 },
                 getValue() {
                     console.log('Digitei algo')
+                }, 
+                createNewPlay() {
+                    let indexHome = Math.floor(Math.random() * 20), 
+                        indexOut = Math.floor(Math.random() * 20)
+
+                    if(indexHome == indexOut) {
+                        indexHome = Math.floor(Math.random() * 20); 
+                        indexOut = Math.floor(Math.random() * 20); 
+                    }   
+
+                    this.newPlay.byHouse.team = this.teams[indexHome]; 
+                    this.newPlay.byHouse.goals = 0;
+                    this.newPlay.outHouse.team = this.teams[indexOut];
+                    this.newPlay.outHouse.goals = 0;
+                    console.log(this.newPlay)
+                    this.view = 'form';
+                }, 
+                endingPlay() {
+                    let byHouse = this.newPlay.byHouse;
+                    var goalsOfHouse = parseInt(this.newPlay.byHouse.goals); 
+                    var outSideGoals = parseInt(this.newPlay.outHouse.goals); 
+                    var AdversaryTeam = this.newPlay.outHouse.team;
+                    var TeamOfHouse = byHouse.team;
+                    TeamOfHouse.endPlay(AdversaryTeam, goalsOfHouse, outSideGoals); 
+                    this.view = 'table';
+                },
+                ordering(index) {
+                    this.$set(this.order.sort, index, this.order.sort[index] == 'desc' ? 'asc' : 'desc');
+                }               
+            }, 
+            filters: {
+                balance(team) {
+                    return team.gm - team.gs;
+                },
+                ucwords(value) {
+                    return value.charAt(0).toUpperCase() + value.slice(1)
                 }
             }
         })
