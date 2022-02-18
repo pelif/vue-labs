@@ -161,7 +161,7 @@ Vue.component('new-play', {
             var gm = parseInt(this.goalsByHouse); 
             var gs = parseInt(this.goalsByOut);
             this.houseTeam.endPlay(this.outTeam, gm, gs);
-            this.$emit('end-play', );
+            this.$emit('end-play');
         }
     }
 })
