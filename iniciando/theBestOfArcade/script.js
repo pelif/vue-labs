@@ -54,6 +54,68 @@ Vue.component('new-game', {
     }
 })
 
+Vue.component('table-players', {
+    props:['players'],
+    data() {
+        return {
+            search: '',
+            order: {
+                fields: ['Vitórias','Derrotas','Lutas Vencidas','Lutas Perdidas'],
+                sort: ['desc', 'desc', 'desc', 'desc']
+            }
+        }
+    },
+    template: `
+        <div>
+        <div class="form-group" style="margin-top:22px;">
+            <input 
+                type="text" 
+                name="" 
+                v-model="search" 
+                class="form-control col-md-4" 
+                placeholder="Digite o nome do player">
+        </div>
+        <table class="table table-stripedd">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th v-for="(field,index) in order.fields">
+                    <a href="#" @click.prevent="ordering(index)">{{ field }}</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(player,index) in playerOrder">
+                    <td><data-player :player="player"></data-player></td>
+                    <td>{{ player.victories }}</td>
+                    <td>{{ player.defeats }}</td>
+                    <td>{{ player.fightsWon }}</td>
+                    <td>{{ player.lostFights }}</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    `,
+    computed: {
+        playerOrder() {
+            let players = _.orderBy(this.orderedPlayers, this.order.fields, this.order.sort);
+            let self = this;
+            return _.filter(players, function(player) {
+                let search = self.search.toLowerCase();
+                return player.name.toLowerCase().indexOf(search) >= 0;
+            })
+        },
+        orderedPlayers() {
+            return _.orderBy(this.players, this.order.fields, this.order.ordering)
+        }
+    },
+    methods: {
+        ordering(index) {
+            this.$set(this.order.sort, index, this.order.sort[index] == 'desc' ? 'asc' : 'desc');            
+        }
+    }
+})
+
 
 new Vue({
     el: "#app",
@@ -88,8 +150,7 @@ new Vue({
         },
         endingGame() {
 
-        }
-      
+        }      
     }
     
 })
