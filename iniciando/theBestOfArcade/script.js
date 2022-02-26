@@ -85,7 +85,9 @@ Vue.component('table-players', {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(player,index) in playerOrder">
+                <tr 
+                    v-for="(player,index) in playerOrder"
+                    :class="{'table-danger': player.defeats >= 3 ? 'alert alert-danger' : ''}">
                     <td><data-player :player="player"></data-player></td>
                     <td>{{ player.victories }}</td>
                     <td>{{ player.defeats }}</td>
@@ -111,6 +113,7 @@ Vue.component('table-players', {
     },
     methods: {
         ordering(index) {
+            console.log(this.order.sort[index])
             this.$set(this.order.sort, index, this.order.sort[index] == 'desc' ? 'asc' : 'desc');            
         }
     }
