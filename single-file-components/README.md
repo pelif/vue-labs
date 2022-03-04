@@ -1,29 +1,6 @@
-# single-file-components
+# Estudos sobre Vue JS
 
-## Project setup
-```
-npm install
-```
+## Single File Components
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+Esta parte do repositório contém códigos provenientes de alguns estudos meus a respeito de single file components. Seguindo este conceito cada componente é separado à parte em um arquivo. Este arquivo contém template html, script js e css. 
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
