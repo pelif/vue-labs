@@ -1,6 +1,7 @@
-import store from './store'
 
-export default {
+import store from '../store/modules/todo'
+
+export default {    
     data() {
         return {
             IdSearch: null,
@@ -9,13 +10,13 @@ export default {
     }, 
     computed: {
         doneTodos() {            
-            return this.$store.getters.doneTodosCount            
+            return store.getters.doneTodosCount            
         },
         doneTodosCount() {
-            return this.$store.getters.doneTodos
+            return store.getters.doneTodos
         },
         todoById() {
-            return this.$store.getters.getTodoById(IdSearch)
+            return store.getters.getTodoById(IdSearch)
         }
     },
     methods: {

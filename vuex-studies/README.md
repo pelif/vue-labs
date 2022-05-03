@@ -1,4 +1,4 @@
-# vuex-modules
+# vuex-studies
 
 > A Vue.js project
 
