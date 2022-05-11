@@ -18,10 +18,6 @@ module.exports = {
         }
       },
       {
-        test: /\.css$/, 
-        use: ['vue-style-loader', 'css-loader', 'file-loader']
-      }, 
-      {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/
@@ -40,9 +36,9 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      'jQuery': 'jquery'
-    })
+      new webpack.ProvidePlugin({
+        'jQuery': 'jquery'
+      })
   ],
   resolve: {
     alias: {
