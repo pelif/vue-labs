@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import store from './store';
 import Addresses from './components/Address';
+import Products from './components/Products'; 
 
 import $ from 'jquery';
 import PopperJs from 'popper.js';
@@ -13,10 +14,15 @@ require('bootstrap');
 new Vue({
   el: '#app',
   store,
-  components: { Addresses },    
+  components: { Addresses, Products },    
   template: `
     <div>
-      <Addresses></Addresses>
+      <Products></Products>
     </div>
   `
+  // template: `
+  //   <div>
+  //     <Addresses></Addresses>
+  //   </div>
+  // `
 })
