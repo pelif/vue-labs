@@ -30,7 +30,11 @@ export default {
                         name="cep" 
                         id="cep"
                         v-model="zipCode">
-                    <button @click="setZipCode" class="btn btn-primary">Buscar</button>
+                    <button 
+                        @click="setZipCode" 
+                        class="btn btn-primary">
+                        Buscar
+                    </button>
 
                     <br>
                     <strong v-if="zipCode != null && zipCode.length == 7">{{ zipCode }}</strong>

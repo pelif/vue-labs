@@ -36,12 +36,37 @@ const Addresses = {
 const Products = {
     state: () => ({
         id: null,
-        products: null,
+        products: null,        
+        added: 0, 
+        productsAdded: [],
+        view: 'products'
     }),
     mutations: {
         setProducts (state, dataProducts) {
-            state.products = dataProducts
-            console.log(state.products)
+            state.products = dataProducts                
+        },
+        setProductsAdded(state, product) {            
+            let test = state.productsAdded.filter(el => el.id == product.product.id);             
+            if(test.length == 0) {
+                state.productsAdded.push(product.product)
+            }                        
+        },
+        updateView(state) {
+            if(state.view == 'products') {
+                state.view = 'cart';
+            } else {
+                state.view = 'products';
+            }            
+        },
+        removeProductAdded(state, param) {
+            let prod = param.param; 
+            let count = 0; 
+            state.productsAdded.map((el) => {
+                if(prod.id === el.id) {
+                    state.productsAdded.splice(count, 1); 
+                }
+                count++;
+            });
         }
     },
     actions: {
@@ -56,6 +81,15 @@ const Products = {
                }).catch((error) => {
                    alert(error); 
                });
+        },
+        'add'(context, product) {               
+            context.commit('setProductsAdded', product); 
+        },
+        'setView'(context) {
+            context.commit('updateView');
+        },
+        'removeOfCart'(context, param) {
+            context.commit('removeProductAdded', param)
         }
     }
 }
